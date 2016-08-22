@@ -1,3 +1,5 @@
+F:\development\C# projects\FitBitMVC\FitBitMVC\obj\Debug\FitBitMVC.Migrations.InitialCreate.resources
+F:\development\C# projects\FitBitMVC\FitBitMVC\obj\Debug\FitBitMVC.csproj.GenerateResource.Cache
 F:\development\C# projects\FitBitMVC\FitBitMVC\bin\ApplicationInsights.config
 F:\development\C# projects\FitBitMVC\FitBitMVC\bin\roslyn\csc.exe
 F:\development\C# projects\FitBitMVC\FitBitMVC\bin\roslyn\Microsoft.Build.Tasks.CodeAnalysis.dll
@@ -17,6 +19,7 @@ F:\development\C# projects\FitBitMVC\FitBitMVC\bin\FitBitMVC.pdb
 F:\development\C# projects\FitBitMVC\FitBitMVC\bin\Antlr3.Runtime.dll
 F:\development\C# projects\FitBitMVC\FitBitMVC\bin\EntityFramework.dll
 F:\development\C# projects\FitBitMVC\FitBitMVC\bin\EntityFramework.SqlServer.dll
+F:\development\C# projects\FitBitMVC\FitBitMVC\bin\EPPlus.dll
 F:\development\C# projects\FitBitMVC\FitBitMVC\bin\Microsoft.AI.Agent.Intercept.dll
 F:\development\C# projects\FitBitMVC\FitBitMVC\bin\Microsoft.AI.DependencyCollector.dll
 F:\development\C# projects\FitBitMVC\FitBitMVC\bin\Microsoft.AI.PerfCounterCollector.dll
@@ -40,6 +43,7 @@ F:\development\C# projects\FitBitMVC\FitBitMVC\bin\Microsoft.Owin.Security.Twitt
 F:\development\C# projects\FitBitMVC\FitBitMVC\bin\Microsoft.Web.Infrastructure.dll
 F:\development\C# projects\FitBitMVC\FitBitMVC\bin\Newtonsoft.Json.dll
 F:\development\C# projects\FitBitMVC\FitBitMVC\bin\Owin.dll
+F:\development\C# projects\FitBitMVC\FitBitMVC\bin\Owin.Security.Providers.Fitbit.dll
 F:\development\C# projects\FitBitMVC\FitBitMVC\bin\System.Web.Helpers.dll
 F:\development\C# projects\FitBitMVC\FitBitMVC\bin\System.Web.Mvc.dll
 F:\development\C# projects\FitBitMVC\FitBitMVC\bin\System.Web.Optimization.dll
@@ -48,12 +52,14 @@ F:\development\C# projects\FitBitMVC\FitBitMVC\bin\System.Web.WebPages.Deploymen
 F:\development\C# projects\FitBitMVC\FitBitMVC\bin\System.Web.WebPages.dll
 F:\development\C# projects\FitBitMVC\FitBitMVC\bin\System.Web.WebPages.Razor.dll
 F:\development\C# projects\FitBitMVC\FitBitMVC\bin\WebGrease.dll
+F:\development\C# projects\FitBitMVC\FitBitMVC\bin\EPPlus.xml
 F:\development\C# projects\FitBitMVC\FitBitMVC\bin\Microsoft.AI.DependencyCollector.xml
 F:\development\C# projects\FitBitMVC\FitBitMVC\bin\Microsoft.AI.ServerTelemetryChannel.xml
 F:\development\C# projects\FitBitMVC\FitBitMVC\bin\Microsoft.AI.Web.xml
 F:\development\C# projects\FitBitMVC\FitBitMVC\bin\Microsoft.AI.WindowsServer.xml
 F:\development\C# projects\FitBitMVC\FitBitMVC\bin\Microsoft.ApplicationInsights.xml
 F:\development\C# projects\FitBitMVC\FitBitMVC\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.xml
+F:\development\C# projects\FitBitMVC\FitBitMVC\bin\Newtonsoft.Json.xml
 F:\development\C# projects\FitBitMVC\FitBitMVC\bin\System.Web.Helpers.xml
 F:\development\C# projects\FitBitMVC\FitBitMVC\bin\System.Web.Mvc.xml
 F:\development\C# projects\FitBitMVC\FitBitMVC\bin\System.Web.Optimization.xml
@@ -62,7 +68,6 @@ F:\development\C# projects\FitBitMVC\FitBitMVC\bin\System.Web.WebPages.xml
 F:\development\C# projects\FitBitMVC\FitBitMVC\bin\System.Web.WebPages.Deployment.xml
 F:\development\C# projects\FitBitMVC\FitBitMVC\bin\System.Web.WebPages.Razor.xml
 F:\development\C# projects\FitBitMVC\FitBitMVC\bin\Antlr3.Runtime.pdb
-F:\development\C# projects\FitBitMVC\FitBitMVC\bin\Newtonsoft.Json.xml
 F:\development\C# projects\FitBitMVC\FitBitMVC\bin\EntityFramework.xml
 F:\development\C# projects\FitBitMVC\FitBitMVC\bin\EntityFramework.SqlServer.xml
 F:\development\C# projects\FitBitMVC\FitBitMVC\bin\Microsoft.AspNet.Identity.Core.xml
@@ -77,7 +82,5 @@ F:\development\C# projects\FitBitMVC\FitBitMVC\bin\Microsoft.Owin.Security.OAuth
 F:\development\C# projects\FitBitMVC\FitBitMVC\bin\Microsoft.Owin.Security.Google.xml
 F:\development\C# projects\FitBitMVC\FitBitMVC\bin\Microsoft.Owin.Security.Twitter.xml
 F:\development\C# projects\FitBitMVC\FitBitMVC\bin\Microsoft.Owin.Security.MicrosoftAccount.xml
-F:\development\C# projects\FitBitMVC\FitBitMVC\obj\Debug\FitBitMVC.csprojResolveAssemblyReference.cache
 F:\development\C# projects\FitBitMVC\FitBitMVC\obj\Debug\FitBitMVC.dll
 F:\development\C# projects\FitBitMVC\FitBitMVC\obj\Debug\FitBitMVC.pdb
-F:\development\C# projects\FitBitMVC\FitBitMVC\bin\Owin.Security.Providers.Fitbit.dll

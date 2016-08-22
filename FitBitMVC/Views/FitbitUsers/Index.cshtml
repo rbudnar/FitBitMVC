@@ -1,0 +1,51 @@
+﻿@model IEnumerable<FitBitMVC.Models.FitbitUser>
+
+@{
+    ViewBag.Title = "Index";
+}
+@Html.Partial("UserMenu")
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.AccessToken)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.RefreshToken)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.FirstName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.TimeStamp)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.AccessToken)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.RefreshToken)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.FirstName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.TimeStamp)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.UniqueID }) |
+            @Html.ActionLink("Details", "Details", new { id=item.UniqueID }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.UniqueID })
+        </td>
+    </tr>
+}
+
+</table>

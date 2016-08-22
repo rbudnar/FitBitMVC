@@ -1,0 +1,155 @@
+﻿@using FitBitMVC.Controllers
+@using FitBitMVC.Models
+@model FitBitMVC.Models.UserGroupViewModel
+
+@{
+    ViewBag.Title = "Edit";
+}
+
+<h2>Edit</h2>
+
+
+@using (Html.BeginForm("Edit", "Groups", FormMethod.Post, new { id  = ""}))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <h4>UserGroup</h4>
+        <hr/>
+        @Html.ValidationSummary(true, "", new {@class = "text-danger"})
+        @Html.HiddenFor(model => model.FbGroup.ID)
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.FbGroup.Name, htmlAttributes: new {@class = "control-label col-md-2"})
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.FbGroup.Name, new {htmlAttributes = new {@class = "form-control"}})
+                @Html.ValidationMessageFor(model => model.FbGroup.Name, "", new {@class = "text-danger"})
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.FbGroup.Enabled, htmlAttributes: new {@class = "control-label col-md-2"})
+            <div class="col-md-10">
+                <div class="checkbox">
+                    @Html.EditorFor(model => model.FbGroup.Enabled)
+                    @Html.ValidationMessageFor(model => model.FbGroup.Enabled, "", new {@class = "text-danger"})
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Save" class="btn btn-default"/>
+            </div>
+        </div>
+    </div>
+}
+
+
+@using (Html.BeginForm("AddMember", "Groups", FormMethod.Post, new { id = Model.FbGroup.ID }))
+{
+    @Html.AntiForgeryToken()
+<div class="form-horizontal">
+        <h4>Add group members</h4>
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+        @Html.HiddenFor(model => model.FbGroup.ID)
+        @Html.HiddenFor(model => model.FbGroup.Name)
+
+    <div class="form-group">
+            @Html.LabelFor(model => model.FBUser.FirstName, htmlAttributes: new {@class = "control-label col-md-2"})
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.FBUser.FirstName, new {htmlAttributes = new {@class = "form-control"}})
+                @Html.ValidationMessageFor(model => model.FBUser.FirstName, "", new {@class = "text-danger"})
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.FBUser.LastName, htmlAttributes: new {@class = "control-label col-md-2"})
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.FBUser.LastName, new {htmlAttributes = new {@class = "form-control"}})
+                @Html.ValidationMessageFor(model => model.FBUser.LastName, "", new {@class = "text-danger"})
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.FBUser.Email, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.FBUser.Email, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.FBUser.Email, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+    <div class="form-group2">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Add User" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+
+}
+
+
+<div>
+
+    <table class="table">
+        <tr>
+            <th>
+                First Name
+            </th>
+            <th>
+                Last Name
+            </th>
+            <th>
+                Email
+            </th>
+            <th>
+                FitbitID
+            </th>
+            <th></th>
+        </tr>
+
+
+        @{
+            //List<AssignedUsers> users = ViewBag.GroupUsers;
+            var users = Model.FbGroup.Users;
+        }
+
+        @foreach (var item in users)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FirstName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.LastName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Email)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FitbitID)
+                </td>
+                
+                <td>
+                    @Html.ActionLink("Edit", "Edit", "FitbitUsers", new { id = item.UniqueID }, null) |
+                    @Html.ActionLink("Details", "Details", "FitbitUsers", new { id = item.UniqueID }, null) |
+                    @Html.ActionLink("Delete", "Delete", "FitbitUsers", new { id = item.UniqueID }, null)
+                </td>
+            </tr>
+        }
+
+    </table>
+
+
+</div>
+
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

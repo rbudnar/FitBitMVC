@@ -1,0 +1,83 @@
+﻿@using FitBitMVC.Models
+@using Microsoft.Ajax.Utilities
+@model FitBitMVC.ViewModels.SSConfigViewModel
+
+<script language="javascript" type="text/javascript">
+
+    $(window).load(function() {
+            $('#appendEDomain').change(function() {
+                $('#eDomain').attr('disabled', !this.checked);
+            });
+    });
+
+</script>
+
+@using (Html.BeginForm("SpreadSheetConfirm", "FitbitUsers", FormMethod.Post))
+{
+
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <h4>Map Spreadsheet Columns</h4>
+        <hr />
+        @Html.HiddenFor(model => model.FileID)
+        @Html.HiddenFor(model => model.GroupID)
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.GroupName, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DisplayFor(model => model.GroupName, new { htmlAttributes = new { @class = "form-control" } })
+                
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.FirstNameColumn, htmlAttributes: new {@class = "control-label col-md-2"})
+            <div class="col-md-10">
+                @Html.DropDownListFor(model => model.FirstNameColumn, Model.ColumnNames, new {htmlAttributes = new {@class = "form-control"}})
+                @Html.ValidationMessageFor(model => model.FirstNameColumn, "", new {@class = "text-danger"})
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(model => model.LastNameColumn, htmlAttributes: new {@class = "control-label col-md-2"})
+            <div class="col-md-10">
+                @Html.DropDownListFor(model => model.LastNameColumn, Model.ColumnNames, "1", new {htmlAttributes = new {@class = "form-control"}})
+                @Html.ValidationMessageFor(model => model.LastNameColumn, "", new {@class = "text-danger"})
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.EmailAddress, htmlAttributes: new {@class = "control-label col-md-2"})
+            <div class="col-md-10">
+                @Html.DropDownListFor(model => model.EmailAddress, Model.ColumnNames, new {htmlAttributes = new {@class = "form-control"}})
+                @Html.ValidationMessageFor(model => model.EmailAddress, "", new {@class = "text-danger"})
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.AppendEmailDomain, htmlAttributes: new {@class = "control-label col-md-2"})
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.AppendEmailDomain, new {htmlAttributes = new {id = "appendEDomain" } })
+                @Html.ValidationMessageFor(model => model.AppendEmailDomain, "", new {@class = "text-danger"})
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.EmailDomain, htmlAttributes: new {@class = "control-label col-md-2"})
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.EmailDomain, new {htmlAttributes = new {@class = "form-control", id = "eDomain"} })
+                @Html.ValidationMessageFor(model => model.EmailDomain, "", new {@class = "text-danger"})
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Save" class="btn btn-default" onclick=""/>
+            </div>
+        </div>
+
+    </div>
+
+
+
+}

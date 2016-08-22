@@ -22,3 +22,14 @@ select,
 textarea {
     max-width: 280px;
 }
+
+.GroupTable {
+    background: blue;width:100%;height: 100%;
+}
+
+.GroupBox {
+    float: left;
+}
+.GroupButtons {
+    float: left;vertical-align: middle;
+}

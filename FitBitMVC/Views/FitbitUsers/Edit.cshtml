@@ -1,0 +1,213 @@
+﻿@using FitBitMVC.Models
+@using Microsoft.Ajax.Utilities
+@model FitBitMVC.ViewModels.UserGroupViewModel
+
+@{
+    ViewBag.Title = "Edit";
+}
+@Html.Partial("UserMenu")
+<script type="text/javascript">
+
+    (function($) {
+        $.fn.myfunction = function() {
+            //var divLength = $('#GroupsNotIn').length;
+            //alert(divLength);
+            var listbox = document.getElementById("GroupsNotIn"); // $('#GroupsNotIn');
+            var listbox2 = document.getElementById("GroupsIn"); //$('GroupsIn');
+            for (var i = 0; i < listbox.options.length; i++) {
+                if (listbox.options[i].selected) {
+                    listbox2.add(new Option(listbox.options[i].text, listbox.options[i].value));
+                    //listbox.remove(listbox.options[i], listbox.options[i].value);
+                    listbox.options[i] = null;
+
+                }
+
+            }
+
+        };
+    })(jQuery);
+
+    (function($) {
+        $.fn.myfunction2 = function() {
+            //var divLength = $('#GroupsNotIn').length;
+            //alert(divLength);
+
+            var listbox = document.getElementById("GroupsIn"); // $('#GroupsNotIn');
+            var listbox2 = document.getElementById("GroupsNotIn"); //$('GroupsIn');
+            for (var i = 0; i < listbox.options.length; i++) {
+                if (listbox.options[i].selected) {
+                    listbox2.add(new Option(listbox.options[i].text, listbox.options[i].value));
+                    //listbox.remove(listbox.options[i], listbox.options[i].value);
+                    listbox.options[i] = null;
+
+                }
+            }
+
+        };
+    })(jQuery);
+</script>
+
+<script language="javascript" type="text/javascript">
+
+    function MoveItem()
+    {
+        $("#GroupsIn option:selected").appendTo("#GroupsNotIn");
+        $('#GroupsIn option:selected').remove();
+    }
+    function MoveBackItem() {
+        $("#GroupsNotIn option:selected").appendTo("#GroupsIn");
+        $('#GroupsNotIn option:selected').remove();
+    }
+    $(function () {
+
+        // this event fires when the browser is about to submit a form
+
+        $('#userEditForm').submit(function () {
+
+            // modifies the 'selected' options on the list 
+
+            // before finally being submitted by the browser
+
+            $('#GroupsNotIn option').prop('selected', true);
+            $('#GroupsIn option').prop('selected', true);
+
+        });
+
+    });
+
+</script>
+
+<h2>Edit</h2>
+
+
+@using (Html.BeginForm("Edit", "FitbitUsers", FormMethod.Post, new {ID = "userEditForm", name ="userEditForm"}))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <h4>FitbitUser</h4>
+        <hr/>
+        @Html.ValidationSummary(true, "", new {@class = "text-danger"})
+        @Html.HiddenFor(model => model.FBUser.FitbitID)
+        @Html.HiddenFor(model => model.FBUser.UniqueID)
+        
+        @Html.HiddenFor(model => model.FBUser.RefreshToken)
+
+        @for (int i = 0; i < Model.FBUser.Groups.Count(); i++)
+        {
+            @Html.HiddenFor(gr => Model.FBUser.Groups[i].Name)
+            @Html.HiddenFor(gr => Model.FBUser.Groups[i].ID)
+            @Html.HiddenFor(gr => Model.FBUser.Groups[i].Enabled)
+        }
+
+        @for (int i = 0; i< Model.GroupsInList.Count(); i++)
+        {
+          @Html.HiddenFor(gr => gr.GroupsInList[i].ID)
+          @Html.HiddenFor(gr => gr.GroupsInList[i].Enabled)
+          @Html.HiddenFor(gr => gr.GroupsInList[i].Name)
+        }
+
+          @for (int i = 0; i < Model.GroupsNotInList.Count(); i++)
+          {
+              @Html.HiddenFor(gr => gr.GroupsNotInList[i].ID)
+              @Html.HiddenFor(gr => gr.GroupsNotInList[i].Enabled)
+              @Html.HiddenFor(gr => gr.GroupsNotInList[i].Name)
+          }
+
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.FBUser.UniqueID, htmlAttributes: new {@class = "control-label col-md-2"})
+            <div class="col-md-10">
+                @Html.DisplayFor(model => model.FBUser.UniqueID, new {htmlAttributes = new {@class = "form-control"}})
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.FBUser.FirstName, htmlAttributes: new {@class = "control-label col-md-2"})
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.FBUser.FirstName, new {htmlAttributes = new {@class = "form-control"}})
+                @Html.ValidationMessageFor(model => model.FBUser.FirstName, "", new {@class = "text-danger"})
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.FBUser.LastName, htmlAttributes: new {@class = "control-label col-md-2"})
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.FBUser.LastName, new {htmlAttributes = new {@class = "form-control"}})
+                @Html.ValidationMessageFor(model => model.FBUser.LastName, "", new {@class = "text-danger"})
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.FBUser.Email, htmlAttributes: new {@class = "control-label col-md-2"})
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.FBUser.Email, new {htmlAttributes = new {@class = "form-control"}})
+                @Html.ValidationMessageFor(model => model.FBUser.Email, "", new {@class = "text-danger"})
+            </div>
+        </div>
+
+        @Html.LabelFor(model => model.GroupsNotInList, htmlAttributes: new {@class = "control-label col-md-2"})
+        @Html.LabelFor(model => model.GroupsInList, htmlAttributes: new {@class = "control-label col-md-2"})
+            <br/>
+        <div class="GroupTable">
+            <div class="GroupBox">
+                <div class="col-md-10">
+                    @Html.ListBoxFor(m => m.GroupsNotIn, new MultiSelectList(Model.GroupsNotInList, "ID", "Name"), new {size = 5, ID = "GroupsNotIn"})
+
+                </div>
+            </div>
+            <div class="GroupButtons">
+                <button type="button" onclick="MoveBackItem();">>></button><br/>
+                <button type="button" onclick="MoveItem();"><<</button>
+            </div>
+
+            <div class="GroupBox">
+                <div class="col-md-10">
+                    @Html.ListBoxFor(m => m.GroupsIn, new MultiSelectList(Model.GroupsInList, "ID", "Name"), new {size = 5, ID = "GroupsIn"})
+
+                </div>
+
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.FBUser.AccessToken, htmlAttributes: new {@class = "control-label col-md-2"})
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.FBUser.AccessToken, new {htmlAttributes = new {@class = "form-control"}})
+                @Html.ValidationMessageFor(model => model.FBUser.AccessToken, "", new {@class = "text-danger"})
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.FBUser.RefreshToken, htmlAttributes: new {@class = "control-label col-md-2"})
+            <div class="col-md-10">
+                @Html.DisplayFor(model => model.FBUser.RefreshToken)
+                @Html.ValidationMessageFor(model => model.FBUser.RefreshToken, "", new {@class = "text-danger"})
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Save" class="btn btn-default" onclick=""/>
+            </div>
+        </div>
+    </div>
+
+   @* @Html.DisplayFor(model => model.FBUser.Groups)
+    foreach (var g in Model.FBUser.Groups)
+    {
+       <br/>  @Html.DisplayFor(gr => g.Name)
+       <br /> @Html.DisplayFor(gr => g.ID)
+       <br /> @Html.DisplayFor(gr => g.Enabled)
+
+    }*@
+}
+
+    <div>
+        @Html.ActionLink("Back to List", "Index")
+    </div>
+
+    @section Scripts {
+        @Scripts.Render("~/bundles/jqueryval")
+    }

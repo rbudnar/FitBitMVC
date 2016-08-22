@@ -35,7 +35,7 @@ namespace FitBitMVC.Models
 
                     if (result > 0)
                     {
-                        sql = $"UPDATE [Fitbit].[dbo].[Participants] " +
+                        sql = $"UPDATE [Fitbit].[dbo].[FitbitUsers] " +
                               $"SET [AccessToken] = '{userCredentials.AccessToken}', [Name] = '{userCredentials.Name}', [RefreshToken] = '{userCredentials.RefreshToken}'" +
                               $"WHERE [FitbitID] = '{userCredentials.UserID}'";
                     }
@@ -76,7 +76,7 @@ namespace FitBitMVC.Models
 
                 try
                 {
-                    sql = $"select [NAME], [ACCESSTOKEN], [REFRESHTOKEN], [TIMESTAMP] from [Fitbit].[dbo].[Participants] where [FitbitID] = '{userID}'";
+                    sql = $"select [NAME], [ACCESSTOKEN], [REFRESHTOKEN], [TIMESTAMP] from [Fitbit].[dbo].[FitbitUsers] where [FitbitID] = '{userID}'";
                     SqlCommand command = new SqlCommand(sql, conn);
                     var rdr = command.ExecuteReader();
 

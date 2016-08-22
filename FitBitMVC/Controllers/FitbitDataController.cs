@@ -24,13 +24,17 @@ namespace FitBitMVC.Controllers
             return View();
         }
 
-        public string Index2()
+        public ActionResult Index2(string name, int ID = 1)
         {
-            return "This is a <b>test</b> </br> <button content=\"hi\">";
+            //return "This is a <b>test</b> </br> <button>content</button>";
+            //return HttpUtility.HtmlEncode("Hello " + name + ", ID is: " + ID);
+            ViewBag.Message = "Hey! " + name;
+            ViewBag.NumTimes = ID;
+            return View();
         }
 
         // GET: FitbitData/Details/5
-        public ActionResult Details(int id)
+        public ActionResult TestData()
         {
             return View();
         }
@@ -124,8 +128,8 @@ namespace FitBitMVC.Controllers
 
                 FitbitDataModel model = new FitbitDataModel();
                 FitbitCredentials user = model.GetCredentials("4QTKJN");
-                //if (user.TimeStamp + new TimeSpan(1, 0, 0) < DateTime.Now)
-                //{
+                if (user.TimeStamp + new TimeSpan(1, 0, 0) < DateTime.Now)
+                {
                     try
                     {
                         using (var wb = new WebClient())
@@ -159,7 +163,7 @@ namespace FitBitMVC.Controllers
                     }
 
 
-                //}
+                }
 
                 string urlworkout = "https://api.fitbit.com/1/user/" + user.UserID + "/activities/date/2016-07-22.json";
 

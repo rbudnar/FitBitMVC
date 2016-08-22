@@ -1,0 +1,383 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.Entity;
+using System.Data.Entity.Validation;
+using System.Data.OleDb;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Web;
+using System.Web.Configuration;
+using System.Web.Mvc;
+using System.Web.Routing;
+using FitBitMVC.Models;
+using FitBitMVC.ViewModels;
+using OfficeOpenXml;
+using File = FitBitMVC.Models.File;
+
+namespace FitBitMVC.Controllers
+{
+    public class FitbitUsersController : Controller
+    {
+        private FitbitContext db = new FitbitContext();
+
+        // GET: FitbitUsers
+        public ActionResult Index()
+        {
+            return View(db.FitbitUsers.ToList());
+        }
+
+        // GET: FitbitUsers/Details/5
+        public ActionResult Details(string id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            FitbitUser fitbitUser = db.FitbitUsers.Find(id);
+            if (fitbitUser == null)
+            {
+                return HttpNotFound();
+            }
+            return View(fitbitUser);
+        }
+
+        // GET: FitbitUsers/Create
+        public ActionResult Create()
+        {
+            return View();
+        }
+
+        // POST: FitbitUsers/Create
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Create([Bind(Include = "FitbitID,AccessToken,RefreshToken,Name,TimeStamp")] FitbitUser fitbitUser)
+        {
+            if (ModelState.IsValid)
+            {
+                db.FitbitUsers.Add(fitbitUser);
+                try
+                {
+                    db.SaveChanges();
+
+                }
+                catch (DbEntityValidationException dbEx)
+                {
+                    foreach (var validationErrors in dbEx.EntityValidationErrors)
+                    {
+                        foreach (var validationError in validationErrors.ValidationErrors)
+                        {
+                            Trace.TraceInformation("Property: {0} Error: {1}",
+                                validationError.PropertyName,
+                                validationError.ErrorMessage);
+                        }
+                    }
+                }
+                return RedirectToAction("Index");
+            }
+            else
+            {
+                var errors = ModelState.Values.SelectMany(v => v.Errors);
+            }
+
+            return View(fitbitUser);
+        }
+
+        // GET: FitbitUsers/Edit/5
+        [HttpGet]
+        public ActionResult Edit(int id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            FitbitUser fitbitUser = db.FitbitUsers.Find(id);
+
+            var allIDS = new HashSet<int>(db.Groups.Select(g => g.ID));
+            var excludedIDs = new HashSet<int>(fitbitUser.Groups.Select(g => g.ID));
+            var groupsInList = fitbitUser.Groups.ToList();
+            var groupsNotInList = db.Groups.Where(g => !excludedIDs.Contains(g.ID)).Select(g => g).ToList();
+
+            var groupIDsNotInList = db.Groups.Where(g => !excludedIDs.Contains(g.ID)).Select(g => g.ID).ToArray();
+
+            var GroupIDsInList = fitbitUser.Groups.Select(g => g.ID).ToArray();
+
+            UserGroupViewModel model = new UserGroupViewModel() {FBUser = fitbitUser, GroupsIn = GroupIDsInList, GroupsNotIn = groupIDsNotInList, GroupsInList = groupsInList, GroupsNotInList = groupsNotInList}; 
+
+            if (fitbitUser == null)
+                return HttpNotFound();
+            
+            return View(model);
+        }
+
+        // POST: FitbitUsers/Edit/5
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Edit(UserGroupViewModel model, int[] groupsIn, int[] groupsNotIn) 
+        {
+            if (ModelState.IsValid)
+            {
+                db.Entry(model.FBUser).State = EntityState.Modified;
+
+                var selectedGroups = new HashSet<int>();
+                if(model.GroupsIn != null)
+                    selectedGroups = new HashSet<int>(model.GroupsIn);
+
+                var fitbitUser = db.FitbitUsers.Find(model.FBUser.UniqueID);
+                var userGroups = new HashSet<int>();
+                if(fitbitUser.Groups != null)
+                    userGroups = new HashSet<int>(fitbitUser.Groups.Select(g => g.ID));
+                else
+                {
+                    fitbitUser.Groups = new List<Group>();
+                }
+
+                foreach (var group in db.Groups)
+                {
+                    if (selectedGroups.Contains(group.ID))
+                    {
+                        if (!userGroups.Contains(group.ID))
+                        {
+                            fitbitUser.Groups.Add(group);
+                        }
+                    }
+                    else
+                    {
+                        if (userGroups.Contains(group.ID))
+                        {
+                            fitbitUser.Groups.Remove(group); //model.FBUser
+                        }
+                    }
+                }
+
+                db.SaveChanges();
+                return RedirectToAction("Index");
+            }
+            else
+            {
+                var errors = ModelState.Values.SelectMany(v => v.Errors);
+            }
+
+            return View(model);
+        }
+
+        // GET: FitbitUsers/Delete/5
+        public ActionResult Delete(string id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            FitbitUser fitbitUser = db.FitbitUsers.Find(id);
+            if (fitbitUser == null)
+            {
+                return HttpNotFound();
+            }
+            return View(fitbitUser);
+        }
+
+        // POST: FitbitUsers/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public ActionResult DeleteConfirmed(string id)
+        {
+            FitbitUser fitbitUser = db.FitbitUsers.Find(id);
+            db.FitbitUsers.Remove(fitbitUser);
+            db.SaveChanges();
+            return RedirectToAction("Index");
+        }
+
+        [HttpGet]
+        public ActionResult UploadUsers()
+        {
+            GroupsViewModel viewModel = new GroupsViewModel(db);
+
+            return View(viewModel);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult UploadUsers(GroupsViewModel groups, HttpPostedFileBase upload)
+        {
+            //GroupsViewModel viewModel = new GroupsViewModel(db);
+            if (ModelState.IsValid)
+            {
+                if (upload != null && upload.ContentLength > 0)
+                {
+                    //DataTable table = new DataTable();
+
+                    //store file in database so we don't have to pass it back to the view during confirmation 
+                    var uploadedFile = new File
+                    {
+                        FileName = upload.FileName,
+                        ContentType = upload.ContentType
+                    };
+
+                    using (var reader = new System.IO.BinaryReader(upload.InputStream))
+                    {
+                        uploadedFile.Content = reader.ReadBytes(upload.ContentLength);
+                        
+                    }
+                    db.Files.Add(uploadedFile);
+                    db.SaveChanges();
+
+                    int id = uploadedFile.FileId;
+
+
+                    try
+                    {
+                        //create a dropdown list for the user to map the spreadsheet columns to the database columns
+                        var columnNames = new List<SelectListItem>();
+
+                        using (var excel = new ExcelPackage(new MemoryStream(uploadedFile.Content)))
+                        {
+                            var sheet = excel.Workbook.Worksheets.First();
+                            //var hasHeader = true;
+                            //foreach (var firstRowCell in sheet.Cells[1, 1, 1, sheet.Dimension.End.Column])
+                            //    table.Columns.Add(hasHeader ? firstRowCell.Text
+                            //        : String.Format("Column {0}", firstRowCell.Start.Column));
+                            int i = 0;
+                            foreach (var firstRowCell in sheet.Cells[1, 1, 1, sheet.Dimension.End.Column])
+                            {
+                                //table.Columns.Add(hasHeader ? firstRowCell.Text : String.Format("Column {0}", firstRowCell.Start.Column));
+                                //cells in this spreadsheet library are 1 indexed, not 0-indexed
+                                columnNames.Add(new SelectListItem { Value = (i+1).ToString(), Text = firstRowCell.Text });
+                                i++;
+                            }
+
+                            //// add DataRows to DataTable
+                            //int startRow = hasHeader ? 2 : 1;
+                            //for (int rowNum = startRow; rowNum <= sheet.Dimension.End.Row; rowNum++)
+                            //{
+                            //    var wsRow = sheet.Cells[rowNum, 1, rowNum, sheet.Dimension.End.Column];
+                            //    DataRow row = table.NewRow();
+                            //    foreach (var cell in wsRow)
+                            //        row[cell.Start.Column - 1] = cell.Text;
+                            //    table.Rows.Add(row);
+                            //}
+                            //var msg = String.Format("DataTable successfully created from excel-file. Column-count:{0} Row-count:{1}",
+                            //                        table.Columns.Count, table.Rows.Count);
+
+                        }
+
+                        
+                        //for (int i = 0; i < table.Columns.Count; i++)
+                        //    columnNames.Add(new SelectListItem { Value = i.ToString(), Text = table.Columns[i].ColumnName });
+
+                        //var groupName = groups.Groups.ToList()[groups.SelectedGroup].Text; //get the name of the group for display later
+                        //var grouplist = groups.Groups.ToList();
+
+                        var groupName = groups.Groups.Single( g => g.Value == groups.SelectedGroup.ToString()).Text;
+
+                        SSConfigViewModel ssc = new SSConfigViewModel { ColumnNames = columnNames, FileID = id, GroupID = groups.SelectedGroup, GroupName = groupName };
+                            
+                        TempData["SSCViewModel"] = ssc;
+                        return RedirectToAction("SpreadSheetConfirm");
+
+                    }
+                    catch (Exception e)
+                    {
+                        Trace.WriteLine(e.Message);
+                    }
+
+
+                }
+
+                return RedirectToAction("Index");
+            }
+
+            return View(groups);
+        }
+
+        public ActionResult SpreadSheetConfirm()
+        {
+            var ssc = TempData["SSCViewModel"] as SSConfigViewModel;
+
+            return View(ssc);
+
+        }
+
+        [HttpPost]
+        public ActionResult SpreadSheetConfirm(SSConfigViewModel ssc)
+        {
+            if (ModelState.IsValid)
+            {
+
+                var file = db.Files.Find(ssc.FileID);
+                DataTable table = new DataTable();
+                Group group = db.Groups.Find(ssc.GroupID);
+                //now that I have the correct columns, I only need to grab those columns and store to DB.
+                using (var excel = new ExcelPackage(new MemoryStream(file.Content)))
+                {
+                    var sheet = excel.Workbook.Worksheets.First();
+                    
+                    //Example - Sheet.Cells["A1:B3"].Value - [row, column]
+                    //table.Columns.Add("FirstName");
+                    //table.Columns.Add("LastName");
+                    //table.Columns.Add("Email");
+
+                    //foreach (var firstRowCell in sheet.Cells[1, 1, 1, sheet.Dimension.End.Column])
+                    //    table.Columns.Add(hasHeader ? firstRowCell.Text
+                    //        : String.Format("Column {0}", firstRowCell.Start.Column));
+
+                    // add DataRows to DataTable
+                    //int startRow = hasHeader ? 2 : 1;
+                    for (int rowNum = 2; rowNum <= sheet.Dimension.End.Row; rowNum++)
+                    {
+                        //var wsRow = sheet.Cells[rowNum, 1, rowNum, sheet.Dimension.End.Column];
+                        try
+                        {
+                            FitbitUser newUser = new FitbitUser
+                            {
+                                Email =
+                                    ssc.AppendEmailDomain
+                                        ? sheet.Cells[rowNum, ssc.EmailAddress].Value + ssc.EmailDomain
+                                        : sheet.Cells[rowNum, ssc.EmailAddress].Value.ToString(),
+                                FirstName = sheet.Cells[rowNum, ssc.FirstNameColumn].Value.ToString(),
+                                LastName = sheet.Cells[rowNum, ssc.LastNameColumn].Value.ToString(),
+                                Groups = new List<Group>()
+                            };
+
+                            newUser.Groups.Add(group);
+
+                            db.FitbitUsers.Add(newUser);
+                        }
+                        catch (NullReferenceException nex)
+                        {
+                            Trace.WriteLine(DateTime.Now + ": A null reference exception was caught (a required cell was empty):" +
+                                            nex.Message);
+                        }
+                        catch (Exception e)
+                        {
+                            Trace.WriteLine(DateTime.Now + ": An exception occurred:" + e.Message);
+                        }
+
+                    }
+
+                    db.SaveChanges();
+                    
+                }
+
+
+                return RedirectToAction("Index");
+            }
+            //if failed:
+            return RedirectToAction("UploadUsers");
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                db.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+    }
+}
