@@ -228,6 +228,7 @@
     <Compile Include="Models\Group.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
+    <Compile Include="ViewModels\AllUsersGroupsViewModel.cs" />
     <Compile Include="ViewModels\GroupsViewModel.cs" />
     <Compile Include="ViewModels\SSConfigViewModel.cs" />
     <Compile Include="ViewModels\UserGroups.cs" />
@@ -311,6 +312,8 @@
     <Content Include="Views\FitbitUsers\UploadUsers.cshtml" />
     <Content Include="Views\Shared\UserMenu.cshtml" />
     <Content Include="Views\FitbitUsers\SpreadsheetConfirm.cshtml" />
+    <Content Include="Views\FitbitUsers\View.cshtml" />
+    <Content Include="Views\FitbitUsers\DeleteFromGroup.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

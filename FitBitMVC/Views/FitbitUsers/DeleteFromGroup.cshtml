@@ -1,0 +1,56 @@
+﻿@model FitBitMVC.ViewModels.AllUsersGroupsViewModel
+
+@{
+    ViewBag.Title = "title";
+}
+
+<h2>Remove the following users</h2>
+
+@using (Html.BeginForm("DeleteFromGroup", "FitbitUsers", FormMethod.Post))
+{
+
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+
+        @*@foreach (var group in Model.ListOfAllGroups)
+        {
+
+            <div>@Html.DisplayFor(model => group.GroupName)</div>
+            @Html.HiddenFor(model => group.UniqueID)
+
+            <div>
+                @foreach (var user in group.Users)
+                {
+                    <li><input type="checkbox" value="@user.UniqueID" checked="@user.IsSelected"/> @user.FullName: @user.Email</li>
+                }
+            </div>
+        }*@
+        @for(int i = 0; i < Model.ListOfAllGroups.Count; i++)
+        {
+
+            <div>@Html.DisplayFor(model => Model.ListOfAllGroups[i].GroupName)</div>
+            @Html.HiddenFor(model => Model.ListOfAllGroups[i].UniqueID)
+            @Html.HiddenFor(model => Model.ListOfAllGroups[i].GroupName)
+
+            <div>
+                @for(int j = 0; j < Model.ListOfAllGroups[i].Users.Count; j++)
+                {
+                    <li>@Html.CheckBoxFor(model => Model.ListOfAllGroups[i].Users[j].IsSelected)
+                        @Html.DisplayFor(model => @Model.ListOfAllGroups[i].Users[j].FullName): @Html.DisplayFor(model => @Model.ListOfAllGroups[i].Users[j].Email)
+                        @Html.HiddenFor(model => @Model.ListOfAllGroups[i].Users[j].UniqueID)
+                        @Html.HiddenFor(model => @Model.ListOfAllGroups[i].Users[j].FullName)
+                        @Html.HiddenFor(model => @Model.ListOfAllGroups[i].Users[j].Email)
+                        @*<input type="checkbox" value="@Model.ListOfAllGroups[i].Users[j].UniqueID" checked="@Model.ListOfAllGroups[i].Users[j].IsSelected"/>
+                        @Model.ListOfAllGroups[i].Users[j].FullName: @Model.ListOfAllGroups[i].Users[j].Email*@
+                    </li>
+                }
+            </div>
+        }
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Save" class="btn btn-default" onclick="" />
+            </div>
+        </div>
+    </div>
+}

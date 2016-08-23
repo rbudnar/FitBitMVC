@@ -210,8 +210,6 @@ namespace FitBitMVC.Controllers
             {
                 if (upload != null && upload.ContentLength > 0)
                 {
-                    //DataTable table = new DataTable();
-
                     //store file in database so we don't have to pass it back to the view during confirmation 
                     var uploadedFile = new File
                     {
@@ -229,7 +227,6 @@ namespace FitBitMVC.Controllers
 
                     int id = uploadedFile.FileId;
 
-
                     try
                     {
                         //create a dropdown list for the user to map the spreadsheet columns to the database columns
@@ -238,40 +235,15 @@ namespace FitBitMVC.Controllers
                         using (var excel = new ExcelPackage(new MemoryStream(uploadedFile.Content)))
                         {
                             var sheet = excel.Workbook.Worksheets.First();
-                            //var hasHeader = true;
-                            //foreach (var firstRowCell in sheet.Cells[1, 1, 1, sheet.Dimension.End.Column])
-                            //    table.Columns.Add(hasHeader ? firstRowCell.Text
-                            //        : String.Format("Column {0}", firstRowCell.Start.Column));
                             int i = 0;
                             foreach (var firstRowCell in sheet.Cells[1, 1, 1, sheet.Dimension.End.Column])
                             {
-                                //table.Columns.Add(hasHeader ? firstRowCell.Text : String.Format("Column {0}", firstRowCell.Start.Column));
                                 //cells in this spreadsheet library are 1 indexed, not 0-indexed
                                 columnNames.Add(new SelectListItem { Value = (i+1).ToString(), Text = firstRowCell.Text });
                                 i++;
                             }
 
-                            //// add DataRows to DataTable
-                            //int startRow = hasHeader ? 2 : 1;
-                            //for (int rowNum = startRow; rowNum <= sheet.Dimension.End.Row; rowNum++)
-                            //{
-                            //    var wsRow = sheet.Cells[rowNum, 1, rowNum, sheet.Dimension.End.Column];
-                            //    DataRow row = table.NewRow();
-                            //    foreach (var cell in wsRow)
-                            //        row[cell.Start.Column - 1] = cell.Text;
-                            //    table.Rows.Add(row);
-                            //}
-                            //var msg = String.Format("DataTable successfully created from excel-file. Column-count:{0} Row-count:{1}",
-                            //                        table.Columns.Count, table.Rows.Count);
-
                         }
-
-                        
-                        //for (int i = 0; i < table.Columns.Count; i++)
-                        //    columnNames.Add(new SelectListItem { Value = i.ToString(), Text = table.Columns[i].ColumnName });
-
-                        //var groupName = groups.Groups.ToList()[groups.SelectedGroup].Text; //get the name of the group for display later
-                        //var grouplist = groups.Groups.ToList();
 
                         var groupName = groups.Groups.Single( g => g.Value == groups.SelectedGroup.ToString()).Text;
 
@@ -285,8 +257,7 @@ namespace FitBitMVC.Controllers
                     {
                         Trace.WriteLine(e.Message);
                     }
-
-
+                    
                 }
 
                 return RedirectToAction("Index");
@@ -318,16 +289,7 @@ namespace FitBitMVC.Controllers
                     var sheet = excel.Workbook.Worksheets.First();
                     
                     //Example - Sheet.Cells["A1:B3"].Value - [row, column]
-                    //table.Columns.Add("FirstName");
-                    //table.Columns.Add("LastName");
-                    //table.Columns.Add("Email");
 
-                    //foreach (var firstRowCell in sheet.Cells[1, 1, 1, sheet.Dimension.End.Column])
-                    //    table.Columns.Add(hasHeader ? firstRowCell.Text
-                    //        : String.Format("Column {0}", firstRowCell.Start.Column));
-
-                    // add DataRows to DataTable
-                    //int startRow = hasHeader ? 2 : 1;
                     for (int rowNum = 2; rowNum <= sheet.Dimension.End.Row; rowNum++)
                     {
                         //var wsRow = sheet.Cells[rowNum, 1, rowNum, sheet.Dimension.End.Column];
@@ -359,7 +321,7 @@ namespace FitBitMVC.Controllers
                         }
 
                     }
-
+                    db.Files.Remove(file); //remove the file from the database, we don't need it anymore.
                     db.SaveChanges();
                     
                 }
@@ -369,6 +331,61 @@ namespace FitBitMVC.Controllers
             }
             //if failed:
             return RedirectToAction("UploadUsers");
+        }
+
+        public ActionResult DeleteFromGroup()
+        {
+            var allGroups = new List<GroupForDeletionViewModel>();
+
+            foreach (Group dbgroup in db.Groups.Include(g => g.Users))
+            {
+                var groupUsers = new List<UserInGroupViewModel>();
+
+                foreach (FitbitUser fitbitUser in dbgroup.Users)
+                {
+                    groupUsers.Add(new UserInGroupViewModel {Email = fitbitUser.Email, UniqueID = fitbitUser.UniqueID, FullName = fitbitUser.FullName, IsSelected = false});    
+                }
+
+                var group = new GroupForDeletionViewModel
+                {
+                    GroupName = dbgroup.Name,
+                    UniqueID = dbgroup.ID,
+                    Users = groupUsers
+                }; 
+
+                allGroups.Add(group);
+            }
+
+            AllUsersGroupsViewModel allViewModel = new AllUsersGroupsViewModel { ListOfAllGroups = allGroups };
+            
+            return View(allViewModel);
+        }
+
+        [HttpPost]
+        public ActionResult DeleteFromGroup(AllUsersGroupsViewModel viewModel)
+        {
+            if (ModelState.IsValid)
+            {
+                foreach (var group in viewModel.ListOfAllGroups)
+                {
+                    var dbgroup = db.Groups.Find(group.UniqueID);
+
+                    List<int> usersInListToRemove = group.Users.Where(user => user.IsSelected).Select(user => user.UniqueID).ToList();
+
+                    foreach (var uniqueID in usersInListToRemove)
+                    {
+                        var userToRemove = db.FitbitUsers.Find(uniqueID);
+                        
+                        dbgroup.Users.Remove(userToRemove);
+                    }
+
+
+                }
+
+                db.SaveChanges();
+            }
+
+            return RedirectToAction("Index");
         }
 
         protected override void Dispose(bool disposing)
