@@ -55,7 +55,7 @@ namespace FitBitMVC.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "FitbitID,AccessToken,RefreshToken,Name,TimeStamp")] FitbitUser fitbitUser)
+        public ActionResult Create([Bind(Include = "UniqueID,Timestamp,FirstName,LastName,Email")]FitbitUser fitbitUser)
         {
             if (ModelState.IsValid)
             {
@@ -168,7 +168,7 @@ namespace FitBitMVC.Controllers
         }
 
         // GET: FitbitUsers/Delete/5
-        public ActionResult Delete(string id)
+        public ActionResult Delete(int id)
         {
             if (id == null)
             {
@@ -185,7 +185,7 @@ namespace FitBitMVC.Controllers
         // POST: FitbitUsers/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public ActionResult DeleteConfirmed(string id)
+        public ActionResult DeleteConfirmed(int id)
         {
             FitbitUser fitbitUser = db.FitbitUsers.Find(id);
             db.FitbitUsers.Remove(fitbitUser);
@@ -356,30 +356,96 @@ namespace FitBitMVC.Controllers
                 allGroups.Add(group);
             }
 
+            //get all users that are in groups
+            //List<FitbitUser> users = db.Groups.SelectMany(gr => gr.Users).ToList();
+
+            List<int> userIDs = db.Groups.SelectMany(gr => gr.Users).Select(u => u.UniqueID).ToList();
+
+
+            //Now get the users that are not in any group
+            var query =
+                //from user in db.FitbitUsers
+                //where !(from gru in users select gru.UniqueID).Contains(user.UniqueID)
+                //select user;
+                from user in db.FitbitUsers
+                where !userIDs.Contains(user.UniqueID)
+                select user;
+
+            List<FitbitUser> list = query.ToList();
+            var usersNotInAnyGroup = new List<UserInGroupViewModel>();
+
+            //create a new list of these objects for the view model
+            usersNotInAnyGroup.AddRange(
+                    query.ToList()
+                        .Select(
+                            u =>
+                                new UserInGroupViewModel
+                                {
+                                    Email = u.Email,
+                                    FullName = u.FullName,
+                                    IsSelected = false,
+                                    UniqueID = u.UniqueID
+                                }));
+
+            //Create a group of users that aren't in any specific group for the view model
+            var UsersNotInGroup = new GroupForDeletionViewModel
+            {
+                GroupName = "Users not in any group",
+                UniqueID = -1,
+                Users = usersNotInAnyGroup
+            };
+            
+            allGroups.Add(UsersNotInGroup);
+
             AllUsersGroupsViewModel allViewModel = new AllUsersGroupsViewModel { ListOfAllGroups = allGroups };
             
             return View(allViewModel);
         }
 
         [HttpPost]
-        public ActionResult DeleteFromGroup(AllUsersGroupsViewModel viewModel)
+        public ActionResult DeleteFromGroup(AllUsersGroupsViewModel viewModel, bool RemoveFromDB = false)
         {
             if (ModelState.IsValid)
             {
                 foreach (var group in viewModel.ListOfAllGroups)
                 {
-                    var dbgroup = db.Groups.Find(group.UniqueID);
 
-                    List<int> usersInListToRemove = group.Users.Where(user => user.IsSelected).Select(user => user.UniqueID).ToList();
-
-                    foreach (var uniqueID in usersInListToRemove)
+                    if (group.UniqueID >= 0)
                     {
-                        var userToRemove = db.FitbitUsers.Find(uniqueID);
+                        var dbgroup = db.Groups.Find(group.UniqueID);
+
+                        if (dbgroup.Users?.Count > 0)
+                        {
+                            List<int> usersInListToRemove = group.Users.Where(user => user.IsSelected).Select(user => user.UniqueID).ToList();
+
+                            foreach (var uniqueID in usersInListToRemove)
+                            {
+                                var userToRemove = db.FitbitUsers.Find(uniqueID);
                         
-                        dbgroup.Users.Remove(userToRemove);
+                                dbgroup.Users.Remove(userToRemove);
+
+                                if (RemoveFromDB)
+                                    db.FitbitUsers.Remove(userToRemove);
+
+                            }
+                        }    
                     }
+                    else if (group.UniqueID == -1 && RemoveFromDB) //this is here to remove users that are not in any group from the database
+                    {
 
+                        if (group.Users?.Count > 0)
+                        {
+                            List<int> usersInListToRemove = group.Users.Where(user => user.IsSelected).Select(user => user.UniqueID).ToList();
 
+                            foreach (var uniqueID in usersInListToRemove)
+                            {
+                                var userToRemove = db.FitbitUsers.Find(uniqueID);
+
+                                db.FitbitUsers.Remove(userToRemove);
+
+                            }
+                        }
+                    }
                 }
 
                 db.SaveChanges();
