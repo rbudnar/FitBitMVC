@@ -220,6 +220,7 @@
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
+    <Compile Include="Models\AppSettings.cs" />
     <Compile Include="Models\File.cs" />
     <Compile Include="Models\FitbitDataModel.cs" />
     <Compile Include="Models\FitbitUser.cs" />
